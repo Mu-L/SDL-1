@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     }
 
     /* Enable standard application logging */
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+    SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
     /* Parse commandline */
     if (!SDLTest_CommonDefaultArgs(state, argc, argv)) {
@@ -66,12 +66,14 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < num_displays; i++) {
         SDL_DisplayID dpy = displays[i];
+        SDL_PropertiesID props = SDL_GetDisplayProperties(dpy);
         SDL_Rect rect = { 0, 0, 0, 0 };
         int m, num_modes = 0;
+        const SDL_bool has_HDR = SDL_GetBooleanProperty(props, SDL_PROP_DISPLAY_HDR_ENABLED_BOOLEAN, SDL_FALSE);
 
         SDL_GetDisplayBounds(dpy, &rect);
         modes = SDL_GetFullscreenDisplayModes(dpy, &num_modes);
-        SDL_Log("%" SDL_PRIu32 ": \"%s\" (%dx%d at %d,%d), content scale %.1f, %d fullscreen modes.\n", dpy, SDL_GetDisplayName(dpy), rect.w, rect.h, rect.x, rect.y, SDL_GetDisplayContentScale(dpy), num_modes);
+        SDL_Log("%" SDL_PRIu32 ": \"%s\" (%dx%d at %d,%d), content scale %.2f, %d fullscreen modes, HDR capable: %s.\n", dpy, SDL_GetDisplayName(dpy), rect.w, rect.h, rect.x, rect.y, SDL_GetDisplayContentScale(dpy), num_modes, has_HDR ? "yes" : "no");
 
         mode = SDL_GetCurrentDisplayMode(dpy);
         if (mode) {

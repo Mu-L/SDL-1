@@ -63,7 +63,7 @@ static Uint32 SDLTest_TestCaseTimeout = 3600;
 char *SDLTest_GenerateRunSeed(const int length)
 {
     char *seed = NULL;
-    SDLTest_RandomContext randomContext;
+    Uint64 randomContext = SDL_GetPerformanceCounter();
     int counter;
 
     /* Sanity check input */
@@ -76,17 +76,17 @@ char *SDLTest_GenerateRunSeed(const int length)
     seed = (char *)SDL_malloc((length + 1) * sizeof(char));
     if (!seed) {
         SDLTest_LogError("SDL_malloc for run seed output buffer failed.");
-        SDL_Error(SDL_ENOMEM);
         return NULL;
     }
 
     /* Generate a random string of alphanumeric characters */
-    SDLTest_RandomInitTime(&randomContext);
     for (counter = 0; counter < length; counter++) {
-        unsigned int number = SDLTest_Random(&randomContext);
-        char ch = (char)(number % (91 - 48)) + 48;
-        if (ch >= 58 && ch <= 64) {
-            ch = 65;
+        char ch;
+        int v = SDL_rand_r(&randomContext, 10 + 26);
+        if (v < 10) {
+            ch = (char)('0' + v);
+        } else {
+            ch = (char)('A' + v - 10);
         }
         seed[counter] = ch;
     }
@@ -151,7 +151,6 @@ static Uint64 SDLTest_GenerateExecKey(const char *runSeed, const char *suiteName
     buffer = (char *)SDL_malloc(entireStringLength);
     if (!buffer) {
         SDLTest_LogError("Failed to allocate buffer for execKey generation.");
-        SDL_Error(SDL_ENOMEM);
         return 0;
     }
     (void)SDL_snprintf(buffer, entireStringLength, "%s%s%s%d", runSeed, suiteName, testName, iteration);
@@ -457,7 +456,6 @@ int SDLTest_RunSuites(SDLTest_TestSuiteReference *testSuites[], const char *user
     failedTests = (const SDLTest_TestCaseReference **)SDL_malloc(totalNumberOfTests * sizeof(SDLTest_TestCaseReference *));
     if (!failedTests) {
         SDLTest_LogError("Unable to allocate cache for failed tests");
-        SDL_Error(SDL_ENOMEM);
         return -1;
     }
 

@@ -391,7 +391,7 @@ static void HandleKeyboardKeyDown(SDL_KeyboardEvent *event)
             continue;
         }
         if (event->which == keyboard_state->instance_id) {
-            switch (event->keysym.sym) {
+            switch (event->key) {
             case SDLK_LEFT:
                 keyboard_state->position.x -= CURSOR_SIZE;
                 if (keyboard_state->position.x < 0.0f) {
@@ -401,7 +401,7 @@ static void HandleKeyboardKeyDown(SDL_KeyboardEvent *event)
             case SDLK_RIGHT:
                 keyboard_state->position.x += CURSOR_SIZE;
                 if (keyboard_state->position.x > w) {
-                    keyboard_state->position.x = w;
+                    keyboard_state->position.x = (float)w;
                 }
                 break;
             case SDLK_UP:
@@ -413,7 +413,7 @@ static void HandleKeyboardKeyDown(SDL_KeyboardEvent *event)
             case SDLK_DOWN:
                 keyboard_state->position.y += CURSOR_SIZE;
                 if (keyboard_state->position.y > h) {
-                    keyboard_state->position.y = h;
+                    keyboard_state->position.y = (float)h;
                 }
                 break;
             default:
@@ -502,10 +502,13 @@ int main(int argc, char *argv[])
     int i;
 
     /* Enable standard application logging */
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+    SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
     /* Log all events, including mouse motion */
     SDL_SetHint(SDL_HINT_EVENT_LOGGING, "2");
+
+    /* Support for multiple keyboards requires raw keyboard events on Windows */
+    SDL_SetHint(SDL_HINT_WINDOWS_RAW_KEYBOARD, "1");
 
     /* Initialize test framework */
     state = SDLTest_CommonCreateState(argv, SDL_INIT_VIDEO);
@@ -521,6 +524,7 @@ int main(int argc, char *argv[])
             SDLTest_CommonQuit(state);
             return 1;
         }
+        i += consumed;
     }
 
     if (!SDLTest_CommonInit(state)) {

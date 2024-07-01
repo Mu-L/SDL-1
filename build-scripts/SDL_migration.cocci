@@ -1292,13 +1292,8 @@ typedef SDL_GameControllerButton, SDL_GamepadButton;
 + SDL_JOYSTICK_TYPE_GAMEPAD
 @@
 @@
-- SDL_JoystickAttachVirtual
-+ SDL_AttachVirtualJoystick
-  (...)
-@@
-@@
 - SDL_JoystickAttachVirtualEx
-+ SDL_AttachVirtualJoystickEx
++ SDL_AttachVirtualJoystick
   (...)
 @@
 @@
@@ -1547,10 +1542,6 @@ typedef SDL_GameControllerButton, SDL_GamepadButton;
 @@
 - KMOD_RCTRL
 + SDL_KMOD_RCTRL
-@@
-@@
-- KMOD_RESERVED
-+ SDL_KMOD_RESERVED
 @@
 @@
 - KMOD_RGUI
@@ -2673,12 +2664,28 @@ typedef SDL_cond, SDL_Condition;
 + SDL_WINDOW_UTILITY
 @@
 @@
-- SDL_PIXELFORMAT_RGB888
-+ SDL_PIXELFORMAT_XRGB8888
+- SDL_PIXELFORMAT_BGR444
++ SDL_PIXELFORMAT_XBGR4444
+@@
+@@
+- SDL_PIXELFORMAT_BGR555
++ SDL_PIXELFORMAT_XBGR1555
 @@
 @@
 - SDL_PIXELFORMAT_BGR888
 + SDL_PIXELFORMAT_XBGR8888
+@@
+@@
+- SDL_PIXELFORMAT_RGB444
++ SDL_PIXELFORMAT_XRGB4444
+@@
+@@
+- SDL_PIXELFORMAT_RGB555
++ SDL_PIXELFORMAT_XRGB1555
+@@
+@@
+- SDL_PIXELFORMAT_RGB888
++ SDL_PIXELFORMAT_XRGB8888
 @@
 @@
 - SDL_strtokr
@@ -2994,11 +3001,6 @@ SDL_GamepadBinding *e1;
 - e1->outputType
 + e1->output_type
 @@
-typedef SDL_version, SDL_Version;
-@@
-- SDL_version
-+ SDL_Version
-@@
 @@
 - SDL_HINT_ALLOW_TOPMOST
 + SDL_HINT_WINDOW_ALLOW_TOPMOST
@@ -3149,3 +3151,340 @@ typedef SDL_Colour, SDL_Color;
 - SDL_iPhoneSetEventPump
 + SDL_iOSSetEventPump
   (...)
+@@
+@@
+- SDL_COMPILEDVERSION
++ SDL_VERSION
+@@
+@@
+- SDL_PATCHLEVEL
++ SDL_MICRO_VERSION
+@@
+@@
+- SDL_TABLESIZE
++ SDL_arraysize
+@@
+@@
+- SDLK_QUOTE
++ SDLK_APOSTROPHE
+@@
+@@
+- SDLK_BACKQUOTE
++ SDLK_GRAVE
+@@
+@@
+- SDLK_QUOTEDBL
++ SDLK_DBLAPOSTROPHE
+@@
+@@
+- SDL_LogSetAllPriority
++ SDL_SetLogPriorities
+  (...)
+@@
+@@
+- SDL_LogSetPriority
++ SDL_SetLogPriority
+  (...)
+@@
+@@
+- SDL_LogGetPriority
++ SDL_GetLogPriority
+  (...)
+@@
+@@
+- SDL_LogResetPriorities
++ SDL_ResetLogPriorities
+  (...)
+@@
+@@
+- SDL_SIMDGetAlignment
++ SDL_GetSIMDAlignment
+  (...)
+@@
+@@
+- SDL_MixAudioFormat
++ SDL_MixAudio
+  (...)
+@@
+@@
+- SDL_BlitScaled
++ SDL_BlitSurfaceScaled
+  (...)
+@@
+@@
+- SDL_SYSTEM_CURSOR_ARROW
++ SDL_SYSTEM_CURSOR_DEFAULT
+@@
+@@
+- SDL_SYSTEM_CURSOR_IBEAM
++ SDL_SYSTEM_CURSOR_TEXT
+@@
+@@
+- SDL_SYSTEM_CURSOR_WAITARROW
++ SDL_SYSTEM_CURSOR_PROGRESS
+@@
+@@
+- SDL_SYSTEM_CURSOR_SIZENWSE
++ SDL_SYSTEM_CURSOR_NWSE_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_SIZENESW
++ SDL_SYSTEM_CURSOR_NESW_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_SIZEWE
++ SDL_SYSTEM_CURSOR_EW_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_SIZENS
++ SDL_SYSTEM_CURSOR_NS_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_SIZEALL
++ SDL_SYSTEM_CURSOR_MOVE
+@@
+@@
+- SDL_SYSTEM_CURSOR_NO
++ SDL_SYSTEM_CURSOR_NOT_ALLOWED
+@@
+@@
+- SDL_SYSTEM_CURSOR_HAND
++ SDL_SYSTEM_CURSOR_POINTER
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_TOPLEFT
++ SDL_SYSTEM_CURSOR_NW_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_TOP
++ SDL_SYSTEM_CURSOR_N_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_TOPRIGHT
++ SDL_SYSTEM_CURSOR_NE_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_RIGHT
++ SDL_SYSTEM_CURSOR_E_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_BOTTOMRIGHT
++ SDL_SYSTEM_CURSOR_SE_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_BOTTOM
++ SDL_SYSTEM_CURSOR_S_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_BOTTOMLEFT
++ SDL_SYSTEM_CURSOR_SW_RESIZE
+@@
+@@
+- SDL_SYSTEM_CURSOR_WINDOW_LEFT
++ SDL_SYSTEM_CURSOR_W_RESIZE
+@@
+@@
+- SDL_SwapLE16
++ SDL_Swap16LE
+  (...)
+@@
+@@
+- SDL_SwapLE32
++ SDL_Swap32LE
+  (...)
+@@
+@@
+- SDL_SwapBE16
++ SDL_Swap16BE
+  (...)
+@@
+@@
+- SDL_SwapBE32
++ SDL_Swap32BE
+  (...)
+@@
+@@
+- SDL_SwapLE64
++ SDL_Swap64LE
+  (...)
+@@
+@@
+- SDL_SwapBE64
++ SDL_Swap64BE
+  (...)
+@@
+@@
+- SDL_SCANCODE_AUDIOMUTE
++ SDL_SCANCODE_MUTE
+@@
+@@
+- SDLK_AUDIOMUTE
++ SDLK_MUTE
+@@
+@@
+- SDL_SCANCODE_EJECT
++ SDL_SCANCODE_MEDIA_EJECT
+@@
+@@
+- SDLK_EJECT
++ SDLK_MEDIA_EJECT
+@@
+@@
+- SDL_SCANCODE_AUDIONEXT
++ SDL_SCANCODE_MEDIA_NEXT_TRACK
+@@
+@@
+- SDLK_AUDIONEXT
++ SDLK_MEDIA_NEXT_TRACK
+@@
+@@
+- SDL_SCANCODE_AUDIOPREV
++ SDL_SCANCODE_MEDIA_PREVIOUS_TRACK
+@@
+@@
+- SDLK_AUDIOPREV
++ SDLK_MEDIA_PREVIOUS_TRACK
+@@
+@@
+- SDL_SCANCODE_AUDIOSTOP
++ SDL_SCANCODE_MEDIA_STOP
+@@
+@@
+- SDLK_AUDIOSTOP
++ SDLK_MEDIA_STOP
+@@
+@@
+- SDL_SCANCODE_AUDIOPLAY
++ SDL_SCANCODE_MEDIA_PLAY
+@@
+@@
+- SDLK_AUDIOPLAY
++ SDLK_MEDIA_PLAY
+@@
+@@
+- SDL_SCANCODE_AUDIOREWIND
++ SDL_SCANCODE_MEDIA_REWIND
+@@
+@@
+- SDLK_AUDIOREWIND
++ SDLK_MEDIA_REWIND
+@@
+@@
+- SDL_SCANCODE_AUDIOFASTFORWARD
++ SDL_SCANCODE_MEDIA_FAST_FORWARD
+@@
+@@
+- SDLK_AUDIOFASTFORWARD
++ SDLK_MEDIA_FAST_FORWARD
+@@
+@@
+- SDL_SCANCODE_MEDIASELECT
++ SDL_SCANCODE_MEDIA_SELECT
+@@
+@@
+- SDLK_MEDIASELECT
++ SDLK_MEDIA_SELECT
+@@
+@@
+- SDLK_a
++ SDLK_A
+@@
+@@
+- SDLK_b
++ SDLK_B
+@@
+@@
+- SDLK_c
++ SDLK_C
+@@
+@@
+- SDLK_d
++ SDLK_D
+@@
+@@
+- SDLK_e
++ SDLK_E
+@@
+@@
+- SDLK_f
++ SDLK_F
+@@
+@@
+- SDLK_g
++ SDLK_G
+@@
+@@
+- SDLK_h
++ SDLK_H
+@@
+@@
+- SDLK_i
++ SDLK_I
+@@
+@@
+- SDLK_j
++ SDLK_J
+@@
+@@
+- SDLK_k
++ SDLK_K
+@@
+@@
+- SDLK_l
++ SDLK_L
+@@
+@@
+- SDLK_m
++ SDLK_M
+@@
+@@
+- SDLK_n
++ SDLK_N
+@@
+@@
+- SDLK_o
++ SDLK_O
+@@
+@@
+- SDLK_p
++ SDLK_P
+@@
+@@
+- SDLK_q
++ SDLK_Q
+@@
+@@
+- SDLK_r
++ SDLK_R
+@@
+@@
+- SDLK_s
++ SDLK_S
+@@
+@@
+- SDLK_t
++ SDLK_T
+@@
+@@
+- SDLK_u
++ SDLK_U
+@@
+@@
+- SDLK_v
++ SDLK_V
+@@
+@@
+- SDLK_w
++ SDLK_W
+@@
+@@
+- SDLK_x
++ SDLK_X
+@@
+@@
+- SDLK_y
++ SDLK_Y
+@@
+@@
+- SDLK_z
++ SDLK_Z

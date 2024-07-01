@@ -259,10 +259,7 @@ static void loadInstanceFunctions(void)
 
 static void createSurface(void)
 {
-    if (!SDL_Vulkan_CreateSurface(vulkanContext->window,
-                                  vulkanContext->instance,
-                                  NULL,
-                                  &vulkanContext->surface)) {
+    if (SDL_Vulkan_CreateSurface(vulkanContext->window, vulkanContext->instance, NULL, &vulkanContext->surface) < 0) {
         vulkanContext->surface = VK_NULL_HANDLE;
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Vulkan_CreateSurface(): %s\n", SDL_GetError());
         quit(2);
@@ -1088,7 +1085,7 @@ int main(int argc, char **argv)
     }
 
     /* Enable standard application logging */
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+    SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
     /* Set Vulkan parameters */
     state->window_flags |= SDL_WINDOW_VULKAN;

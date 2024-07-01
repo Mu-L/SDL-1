@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         goto quit;
     }
 
-    renderer = SDL_CreateRenderer(window, NULL, 0);
+    renderer = SDL_CreateRenderer(window, NULL);
     if (!renderer) {
         SDL_Log("Couldn't create renderer: %s\n", SDL_GetError());
         goto quit;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_EVENT_KEY_DOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                if (event.key.key == SDLK_ESCAPE) {
                     done = SDL_TRUE;
                 }
                 break;

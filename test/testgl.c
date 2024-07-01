@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
     }
 
     /* Enable standard application logging */
-    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
+    SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO);
 
     for (i = 1; i < argc;) {
         int consumed;
@@ -295,18 +295,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    if (state->render_flags & SDL_RENDERER_PRESENTVSYNC) {
-        /* try late-swap-tearing first. If not supported, try normal vsync. */
-        if (SDL_GL_SetSwapInterval(-1) == 0) {
-            swap_interval = -1;
-        } else {
-            SDL_GL_SetSwapInterval(1);
-            swap_interval = 1;
-        }
-    } else {
-        SDL_GL_SetSwapInterval(0); /* disable vsync. */
-        swap_interval = 0;
-    }
+    SDL_GL_SetSwapInterval(state->render_vsync);
+    swap_interval = state->render_vsync;
 
     mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
     if (mode) {
@@ -401,10 +391,10 @@ int main(int argc, char *argv[])
         while (SDL_PollEvent(&event)) {
             SDLTest_CommonEvent(state, &event, &done);
             if (event.type == SDL_EVENT_KEY_DOWN) {
-                if (event.key.keysym.sym == SDLK_o) {
+                if (event.key.key == SDLK_O) {
                     swap_interval--;
                     update_swap_interval = SDL_TRUE;
-                } else if (event.key.keysym.sym == SDLK_p) {
+                } else if (event.key.key == SDLK_P) {
                     swap_interval++;
                     update_swap_interval = SDL_TRUE;
                 }
