@@ -966,8 +966,8 @@ if(SDL_LIBC)
     bcopy
     calloc ceil ceilf copysign copysignf cos cosf
     _Exit exp expf
-    fabs fabsf fdatasync floor floorf fmod fmodf fopen64 free fseeko fseeko64
-    getenv gethostname
+    fabs fabsf floor floorf fmod fmodf fopen64 free fseeko fseeko64
+    getenv
     _i64toa index itoa
     log log10 log10f logf lround lroundf _ltoa
     malloc memcmp memcpy memmove memset modf modff
@@ -1042,6 +1042,8 @@ if(SDL_LIBC)
   cmake_pop_check_state()
 
   if(NOT WINDOWS)
+    check_symbol_exists(fdatasync "unistd.h" HAVE_FDATASYNC)
+    check_symbol_exists(gethostname "unistd.h" HAVE_GETHOSTNAME)
     check_symbol_exists(getpagesize "unistd.h" HAVE_GETPAGESIZE)
     check_symbol_exists(sigaction "signal.h" HAVE_SIGACTION)
     check_symbol_exists(setjmp "setjmp.h" HAVE_SETJMP)
@@ -1724,7 +1726,6 @@ elseif(UNIX AND NOT APPLE AND NOT RISCOS AND NOT HAIKU)
     sdl_sources(
       "${SDL3_SOURCE_DIR}/src/core/linux/SDL_evdev_capabilities.c"
       "${SDL3_SOURCE_DIR}/src/core/linux/SDL_threadprio.c"
-      "${SDL3_SOURCE_DIR}/src/core/linux/SDL_sandbox.c"
     )
 
     # src/core/unix/*.c is included in a generic if(UNIX) section, elsewhere.
@@ -2569,6 +2570,12 @@ elseif(VITA)
     sdl_glob_sources("${SDL3_SOURCE_DIR}/src/sensor/vita/*.c")
   endif()
 
+  if(SDL_CAMERA)
+    set(SDL_CAMERA_DRIVER_VITA 1)
+    set(HAVE_CAMERA TRUE)
+    sdl_glob_sources("${SDL3_SOURCE_DIR}/src/camera/vita/*.c")
+  endif()
+
   if(SDL_VIDEO)
     set(SDL_VIDEO_DRIVER_VITA 1)
     sdl_glob_sources("${SDL3_SOURCE_DIR}/src/video/vita/*.c")
@@ -2649,6 +2656,7 @@ elseif(VITA)
         SceMotion_stub
         ScePower_stub
         SceProcessmgr_stub
+        SceCamera_stub
     )
   endif()
 
