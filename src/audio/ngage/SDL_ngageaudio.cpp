@@ -75,13 +75,17 @@ void CAudio::ConstructL(TInt aLatency)
 CAudio::~CAudio()
 {
     if (iStream) {
+        // Stop the processing thread before stopping the stream.
+        StopThread();
+
         iStream->Stop();
 
-        while (iState != EStateDone) {
-            User::After(100000); // 100ms.
-        }
+        // MaoscBufferCopied(KErrAbort) can't fire here because the active
+        // scheduler is no longer pumping; force the state to avoid deadlock.
+        iState = EStateDone;
 
         delete iStream;
+        iStream = NULL;
     }
 }
 
@@ -98,12 +102,9 @@ void CAudio::Start()
     }
 }
 
-
-
 void CAudio::RunL()
 {
     iTimerActive = EFalse;
-
 }
 
 void CAudio::DoCancel()
@@ -117,10 +118,8 @@ void CAudio::StartThread()
     TInt heapMinSize = 8192;        // 8 KB initial heap size.
     TInt heapMaxSize = 1024 * 1024; // 1 MB maximum heap size.
 
-
     TInt err = iProcess.Create(_L("ProcessThread"), ProcessThreadCB, KDefaultStackSize * 2, heapMinSize, heapMaxSize, this);
-    if (err == KErrNone)
-    {
+    if (err == KErrNone) {
         TThreadPriority prio = EPriorityLess;
 
         const char *prioHint = SDL_GetHint(SDL_HINT_AUDIO_NGAGE_PROCESS_PRIORITY);
@@ -129,7 +128,6 @@ void CAudio::StartThread()
             prio = (TThreadPriority)SDL_atoi(prioHint);
             RThread().SetPriority(prio);
         }
-
 
         iProcess.SetPriority(prio);
         iProcess.Resume();
@@ -148,42 +146,36 @@ void CAudio::StopThread()
 }
 
 /***************************************************
-* ProcessThreadCB -
-*
-* This thread calls the SDL mixer when the buffer is ready and self->iState == EStatePlaying (basically other than initial stated, when not writing)
-*
-* It only mixes, never calls WriteL
-****************************************************/
+ * ProcessThreadCB -
+ *
+ * This thread calls the SDL mixer when the buffer is ready and self->iState == EStatePlaying (basically other than initial stated, when not writing)
+ *
+ * It only mixes, never calls WriteL
+ ****************************************************/
 
 TInt CAudio::ProcessThreadCB(TAny *aPtr)
 {
     CTrapCleanup *cleanup = CTrapCleanup::New();
     if (!cleanup)
         return KErrNoMemory;
-  
+
     CAudio *self = static_cast<CAudio *>(aPtr);
     SDL_AudioDevice *device = NGAGE_GetAudioDeviceAddr();
 
-
     TInt processTick = 40000; // Default 40ms
     const char *tickHint = SDL_GetHint(SDL_HINT_AUDIO_NGAGE_PROCESS_TICK);
-    if (tickHint)
-    {
+    if (tickHint) {
         processTick = SDL_atoi(tickHint) * 1000;
     }
 
-    while (self->iStreamStarted)
-    {
-        if (self->iState == EStatePlaying && !self->iBufferReady)
-        {
-             /* Ask SDL to mix audio into buffer[fill_index]*/
+    while (self->iStreamStarted) {
+        if (self->iState == EStatePlaying && !self->iBufferReady) {
+            /* Ask SDL to mix audio into buffer[fill_index]*/
             SDL_PlaybackAudioThreadIterate(device);
 
-             /*  Signal AudioThreadCB to write it*/
+            /*  Signal AudioThreadCB to write it*/
             self->iBufferReady = ETrue;
-        }
-        else
-        {
+        } else {
             /*if we are not ready to obtain the mix data we sleep a bit this thread*/
             User::After(processTick);
         }
@@ -195,17 +187,17 @@ TInt CAudio::ProcessThreadCB(TAny *aPtr)
 
 static TBool gAudioRunning;
 /***************************************************
-* AudioThreadCB -
-*
-* This thread owns the scheduler and calls WriteL, wich queues the assigned sound buffer to be played
-****************************************************/
+ * AudioThreadCB -
+ *
+ * This thread owns the scheduler and calls WriteL, wich queues the assigned sound buffer to be played
+ ****************************************************/
 
 TInt AudioThreadCB(TAny *aParams)
 {
     CTrapCleanup *cleanup = CTrapCleanup::New();
     CActiveScheduler *scheduler = new CActiveScheduler();
     CActiveScheduler::Install(scheduler);
-    
+
     TRAPD(err, {
         TInt latency = *(TInt *)aParams;
         CAudio *audio = CAudio::NewL(latency);
@@ -215,7 +207,6 @@ TInt AudioThreadCB(TAny *aParams)
 
         gAudioRunning = ETrue;
         audio->Start();
-      
 
         TInt processTick = 5000; // Default 5ms
         const char *tickHint = SDL_GetHint(SDL_HINT_AUDIO_NGAGE_PROCESS_TICK);
@@ -223,34 +214,27 @@ TInt AudioThreadCB(TAny *aParams)
             processTick = SDL_atoi(tickHint) * 1000;
         }
 
-
-        while (gAudioRunning)
-        {
+        while (gAudioRunning) {
             TInt error;
             CActiveScheduler::RunIfReady(error, CActive::EPriorityIdle);
-           
+
             /*there is some mix data sound ready*/
-            if (audio->iBufferReady)
-            {
+            if (audio->iBufferReady) {
                 audio->iBufferReady = EFalse;
 
                 SDL_AudioDevice *device = NGAGE_GetAudioDeviceAddr();
 
-                if (device && device->hidden)
-                {
+                if (device && device->hidden) {
                     SDL_PrivateAudioData *phdata = (SDL_PrivateAudioData *)device->hidden;
                     audio->iState = EStateWriting;
                     /*sends the chuck mixed to the queue*/
                     audio->iBufDes.Set(phdata->buffer[phdata->fill_index], device->buffer_size, device->buffer_size);
                     TRAPD(werr, audio->iStream->WriteL(audio->iBufDes));
 
-                    if (werr != KErrNone)
-                    {
+                    if (werr != KErrNone) {
                         /*asks ProcessThreadCB to bring another mix chunk*/
                         audio->iState = EStatePlaying;
-                    }
-                    else
-                    {
+                    } else {
                         /*swap buffers so while this buffer is being played we can get the mix of the next one if we can*/
                         phdata->fill_index = 1 - phdata->fill_index;
                     }
@@ -270,16 +254,15 @@ TInt AudioThreadCB(TAny *aParams)
 }
 
 /***************************************************
-* MaoscOpenComplete -
-*
-* Opens the audiostream
-*
-* *******************************************************/
+ * MaoscOpenComplete -
+ *
+ * Opens the audiostream
+ *
+ * *******************************************************/
 
 void CAudio::MaoscOpenComplete(TInt aError)
 {
-    if (aError == KErrNone)
-    {
+    if (aError == KErrNone) {
         /*setting the volume to max, users can change the volume later of their channels individually in code*/
         iStream->SetVolume(iStream->MaxVolume());
         iStreamStarted = ETrue;
@@ -296,11 +279,8 @@ void CAudio::MaoscOpenComplete(TInt aError)
 
         /* Kickstart: device is guaranteed valid now*/
         this->iState = EStatePlaying;
-       
 
-    }
-    else
-    {
+    } else {
         SDL_Log("Error: Failed to open audio stream: %d", aError);
     }
 }
@@ -314,17 +294,12 @@ void CAudio::MaoscOpenComplete(TInt aError)
 
 void CAudio::MaoscBufferCopied(TInt aError, const TDesC8 & /*aBuffer*/)
 {
-    if (aError == KErrNone)
-    {
+    if (aError == KErrNone) {
         iState = EStatePlaying;
-    }
-    else if (aError == KErrAbort)
-    {
+    } else if (aError == KErrAbort) {
         /* The stream has been stopped.*/
         iState = EStateDone;
-    }
-    else
-    {
+    } else {
         SDL_Log("Error: Failed to copy audio buffer: %d", aError);
     }
 }
@@ -338,13 +313,12 @@ void CAudio::MaoscBufferCopied(TInt aError, const TDesC8 & /*aBuffer*/)
 
 void CAudio::MaoscPlayComplete(TInt aError)
 {
-   
+
     /* If we finish due to an underflow, we'll need to restart playback.
      Normally KErrUnderlow is raised   at stream end, but in our case the API
      should never see the stream end -- we are continuously feeding it more
      data!  Many underflow errors mean that the latency target is too low.*/
-    if (aError == KErrUnderflow)
-    {
+    if (aError == KErrUnderflow) {
         /*  Restart the stream hardware */
         iStream->Stop();
         TInt ignoredError;
@@ -355,21 +329,16 @@ void CAudio::MaoscPlayComplete(TInt aError)
 
         return;
     } else if (aError != KErrNone) {
-        
     }
 
     /* We shouldn't get here.*/
     SDL_Log("%s: %d", SDL_FUNCTION, aError);
 }
 
-
-
 TBool AudioIsReady()
 {
     return gAudioRunning;
 }
-
-
 
 RThread audioThread;
 
