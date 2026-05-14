@@ -1314,3 +1314,4 @@
 #define SDL_IsPhone SDL_IsPhone_REAL
 #define SDL_LoadJPG_IO SDL_LoadJPG_IO_REAL
 #define SDL_LoadJPG SDL_LoadJPG_REAL
+#define SDL_HasSVE2 SDL_HasSVE2_REAL
