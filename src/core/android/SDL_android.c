@@ -2262,7 +2262,7 @@ ioerr:
 
 static bool CreateAPKNodes(const char *path)
 {
-    SDL_Log("ANDROID: Parsing APK file '%s' ...", path);
+    //SDL_Log("ANDROID: Parsing APK file '%s' ...", path);
 
     SDL_IOStream *io = SDL_IOFromFile(path, "rb");
     if (!io) {
