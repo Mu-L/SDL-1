@@ -88,8 +88,8 @@
 /**
  * Defined if (and only if) the compiler supports ARM SVE2 intrinsics.
  *
- * If this macro is defined, SDL will have already included `<arm_sve.h>`
- * as appropriate.
+ * If this macro is defined, SDL will have already included `<arm_sve.h>` as
+ * appropriate.
  *
  * \since This macro is available since SDL 3.6.0.
  */
