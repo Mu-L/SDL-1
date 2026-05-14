@@ -23,7 +23,7 @@
 #ifndef SDL_gameinput_h_
 #define SDL_gameinput_h_
 
-#ifdef HAVE_GAMEINPUT_H
+#if defined(HAVE_GAMEINPUT_H) && defined(__cplusplus)
 
 #ifdef HAVE_GCC_DIAGNOSTIC_PRAGMA
 #pragma GCC diagnostic push
@@ -59,14 +59,16 @@ extern bool SDL_InitGameInput(IGameInput **ppGameInput);
 extern bool SDL_GameInputReady(void);
 extern void SDL_QuitGameInput(void);
 
-#endif // HAVE_GAMEINPUT_H
+#endif // HAVE_GAMEINPUT_H && __cplusplus
 
+/* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern bool SDL_UsingGameInputForXInputControllers(void);
 
+/* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
