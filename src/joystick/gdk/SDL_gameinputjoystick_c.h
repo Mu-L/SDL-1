@@ -20,38 +20,14 @@
 */
 #include "SDL_internal.h"
 
-#ifndef SDL_gameinput_h_
-#define SDL_gameinput_h_
-
-#ifdef HAVE_GAMEINPUT_H
-
-#ifdef HAVE_GCC_DIAGNOSTIC_PRAGMA
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wundef"
+// Set up for C function definitions, even when using C++
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#include <gameinput.h>
+extern bool SDL_UsingGameInputForXInputControllers(void);
 
-#ifdef HAVE_GCC_DIAGNOSTIC_PRAGMA
-#pragma GCC diagnostic pop
+// Ends C function definitions when using C++
+#ifdef __cplusplus
+}
 #endif
-
-#ifndef GAMEINPUT_API_VERSION
-#define GAMEINPUT_API_VERSION 0
-#endif
-
-#if GAMEINPUT_API_VERSION == 3
-using namespace GameInput::v3;
-#elif GAMEINPUT_API_VERSION == 2
-using namespace GameInput::v2;
-#elif GAMEINPUT_API_VERSION == 1
-using namespace GameInput::v1;
-#endif
-
-extern bool SDL_InitGameInput(IGameInput **ppGameInput);
-extern bool SDL_GameInputReady(void);
-extern void SDL_QuitGameInput(void);
-
-#endif // HAVE_GAMEINPUT_H
-
-#endif // SDL_gameinput_h_

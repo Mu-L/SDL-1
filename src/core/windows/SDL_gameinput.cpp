@@ -77,6 +77,11 @@ bool SDL_InitGameInput(IGameInput **ppGameInput)
     return true;
 }
 
+bool SDL_GameInputReady(void)
+{
+    return (g_pGameInput != NULL);
+}
+
 void SDL_QuitGameInput(void)
 {
     SDL_assert(g_nGameInputRefCount > 0);

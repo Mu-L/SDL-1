@@ -20,6 +20,8 @@
 */
 #include "SDL_internal.h"
 
+#include "SDL_gameinputjoystick_c.h"
+
 #ifdef SDL_JOYSTICK_GAMEINPUT
 
 #include "../SDL_sysjoystick.h"
@@ -28,7 +30,7 @@
 #include "../../core/windows/SDL_gameinput.h"
 
 // Default value for SDL_HINT_JOYSTICK_GAMEINPUT
-#if defined(SDL_PLATFORM_GDK)
+#if defined(SDL_PLATFORM_GDK) || (GAMEINPUT_API_VERSION >= 3)
 #define SDL_GAMEINPUT_DEFAULT true
 #else
 #define SDL_GAMEINPUT_DEFAULT false
@@ -81,10 +83,6 @@ static IGameInput *g_pGameInput = NULL;
 static GameInputCallbackToken g_GameInputCallbackToken = 0;
 static Uint64 g_GameInputTimestampOffset;
 
-extern "C"
-{
-    extern bool SDL_XINPUT_Enabled(void);
-}
 
 static bool GAMEINPUT_InternalIsGamepad(const GameInputDeviceInfo *info)
 {
@@ -242,9 +240,9 @@ static bool GAMEINPUT_InternalAddOrFind(IGameInputDevice *pDevice)
 #endif
 
     if (!GAMEINPUT_InternalIsGamepad(info) && raw_type == SDL_GAMEINPUT_RAWTYPE_NONE) {
-#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
-        if (SDL_GetHintBoolean(SDL_HINT_JOYSTICK_DIRECTINPUT, true) || SDL_XINPUT_Enabled()) {
-            // Let other backends handle non-gamepad controllers to possibly avoid bugs and/or regressions.
+#if defined(SDL_JOYSTICK_DINPUT)
+        // Let other backends handle non-gamepad controllers to possibly avoid bugs and/or regressions.
+        if (SDL_GetHintBoolean(SDL_HINT_JOYSTICK_DIRECTINPUT, true)) {
             return true;
         }
 #endif
@@ -1055,6 +1053,15 @@ static bool GAMEINPUT_JoystickGetGamepadMapping(int device_index, SDL_GamepadMap
     return true;
 }
 
+bool SDL_UsingGameInputForXInputControllers(void)
+{
+    if (SDL_GetHintBoolean(SDL_HINT_JOYSTICK_GAMEINPUT, SDL_GAMEINPUT_DEFAULT) &&
+        SDL_GameInputReady()) {
+        return true;
+    }
+    return false;
+}
+
 
 SDL_JoystickDriver SDL_GAMEINPUT_JoystickDriver =
 {
@@ -1081,5 +1088,12 @@ SDL_JoystickDriver SDL_GAMEINPUT_JoystickDriver =
     GAMEINPUT_JoystickGetGamepadMapping
 };
 
+
+#else
+
+bool SDL_UsingGameInputForXInputControllers(void)
+{
+    return false;
+}
 
 #endif // SDL_JOYSTICK_GAMEINPUT
