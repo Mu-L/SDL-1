@@ -97,9 +97,11 @@ bool SDL_SYS_EnumerateDirectory(const char *path, SDL_EnumerateDirectoryCallback
     DIR *dir = opendir(pathwithsep);
     if (!dir) {
 #ifdef SDL_PLATFORM_ANDROID  // Maybe it's an asset... that didn't use an "assets://" URL?
-        const bool retval = Android_JNI_EnumerateAssetDirectory(pathwithsep + extralen, cb, userdata);
-        SDL_free(pathwithsep);
-        return retval;
+        if (*pathwithsep != '/') {  // don't fall back to asset tree for absolute paths, in case opendir() failed for other reasons, like opendir("/") returning EACCES.
+            const bool retval = Android_JNI_EnumerateAssetDirectory(pathwithsep + extralen, cb, userdata);
+            SDL_free(pathwithsep);
+            return retval;
+        }
 #endif
         SDL_free(pathwithsep);
         return SDL_SetError("Can't open directory: %s", strerror(errno));
