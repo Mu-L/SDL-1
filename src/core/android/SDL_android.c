@@ -1873,6 +1873,7 @@ typedef struct APKNode
 {
     char *name;
     SDL_PathInfo info;
+    struct APKNode *parent;
     struct APKNode *children;
     struct APKNode *next_sibling;
 } APKNode;
@@ -1891,6 +1892,12 @@ static void FreeAPKNode(APKNode *node)
 
 static APKNode *FindAPKChildNode(APKNode *parent, const char *child)
 {
+    if ((child[0] == '.') && (child[1] == '\0')) {  // "." paths just return the current dir.
+        return parent;
+    } else if ((child[0] == '.') && (child[1] == '.') && (child[2] == '\0')) {  // ".." paths return the parent dir (or the current dir if at the root).
+        return parent->parent ? parent->parent : parent;
+    }
+
     for (APKNode *node = parent->children; node != NULL; node = node->next_sibling) {
         if (SDL_strcmp(child, node->name) == 0) {
             return node;
@@ -1979,6 +1986,7 @@ static APKNode *AddAPKChildNode(APKNode *parent, const char *child)
 
         SDL_copyp(&node->info, &parent->info);  // you probably need to update this afterwards.
 
+        node->parent = parent;
         node->next_sibling = parent->children;
         parent->children = node;
     }
@@ -2007,6 +2015,12 @@ static APKNode *AddAPKDirs(char *path, APKNode *parent)
         char *ptr = SDL_strchr(path, '/');
         if (!ptr) {
             break;  // last thing is either an empty string (we ended with a '/'), or an actual file's name, so drop it.
+        }
+
+        if ((path[0] == '.') && ((path[1] == '\0') || ((path[1] == '.') ||(path[2] == '\0'))))
+            // whoa, there's a "." or ".." subdir in a zip entry's path? Fail!
+            SDL_SetError("bogus file path in APK file entry");
+            return NULL;
         }
 
         *ptr = '\0';  // terminate on the end of this subdir's name.
