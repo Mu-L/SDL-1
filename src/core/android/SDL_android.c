@@ -1910,10 +1910,6 @@ static const APKNode *FindAPKNode(const char *constpath)
 {
     //SDL_Log("FindAPKNode('%s') ...", constpath);
 
-    if (*constpath == '\0') {  // don't allow paths of "".
-        return NULL;
-    }
-
     if (SDL_strncmp(constpath, "assets://", 9) == 0) {
         constpath += 9;
     }
