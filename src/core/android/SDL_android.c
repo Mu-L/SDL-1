@@ -2017,7 +2017,7 @@ static APKNode *AddAPKDirs(char *path, APKNode *parent)
             break;  // last thing is either an empty string (we ended with a '/'), or an actual file's name, so drop it.
         }
 
-        if ((path[0] == '.') && ((path[1] == '\0') || ((path[1] == '.') ||(path[2] == '\0'))))
+        if ((path[0] == '.') && ((path[1] == '\0') || ((path[1] == '.') ||(path[2] == '\0')))) {
             // whoa, there's a "." or ".." subdir in a zip entry's path? Fail!
             SDL_SetError("bogus file path in APK file entry");
             return NULL;
