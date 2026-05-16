@@ -1875,6 +1875,7 @@ typedef struct APKNode
     SDL_PathInfo info;
     struct APKNode *parent;
     struct APKNode *children;
+    struct APKNode *children_tail;
     struct APKNode *next_sibling;
 } APKNode;
 
@@ -1983,8 +1984,12 @@ static APKNode *AddAPKChildNode(APKNode *parent, const char *child)
         SDL_copyp(&node->info, &parent->info);  // you probably need to update this afterwards.
 
         node->parent = parent;
-        node->next_sibling = parent->children;
-        parent->children = node;
+        if (parent->children_tail) {  // APKs tend to be sorted alphabetically, so insert new nodes at the end of the list to maintain this order.
+            parent->children_tail->next_sibling = node;
+        } else {
+            parent->children = node;
+        }
+        parent->children_tail = node;
     }
     return node;
 }
