@@ -135,6 +135,8 @@
 
 #ifdef _WIN32
 #define HRESULT_FMT "(0x%08lX)"
+#elif defined(__CYGWIN__) && !defined(_LP64)
+#define HRESULT_FMT "(0x%08lX)"
 #else
 #define HRESULT_FMT "(0x%08X)"
 #endif
