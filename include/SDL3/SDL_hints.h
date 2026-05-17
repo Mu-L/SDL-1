@@ -509,7 +509,8 @@ extern "C" {
 /**
  * Specify whether this audio stream should duck other audio.
  *
- * On Apple platforms, this hint controls whether other audio streams are ducked (reduced in volume) while your application is in the foreground.
+ * On Apple platforms, this hint controls whether other audio streams are
+ * ducked (reduced in volume) while your application is in the foreground.
  *
  * The variable can be set to the following values:
  *
