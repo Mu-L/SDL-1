@@ -294,9 +294,9 @@ extern "C" {
  *
  * The variable can be set to the following values:
  *
+ * - "playback": Use the AVAudioSessionCategoryPlayback category. (default)
  * - "ambient": Use the AVAudioSessionCategoryAmbient audio category, will be
- *   muted by the phone mute switch (default)
- * - "playback": Use the AVAudioSessionCategoryPlayback category.
+ *   muted by the phone mute switch.
  *
  * For more information, see Apple's documentation:
  * https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionCategoriesandModes/AudioSessionCategoriesandModes.html
@@ -505,6 +505,22 @@ extern "C" {
  * \since This hint is available since SDL 3.2.0.
  */
 #define SDL_HINT_AUDIO_DRIVER "SDL_AUDIO_DRIVER"
+
+/**
+ * Specify whether this audio stream should duck other audio.
+ *
+ * On Apple platforms, this hint controls whether other audio streams are ducked (reduced in volume) while your application is in the foreground.
+ *
+ * The variable can be set to the following values:
+ *
+ * - "0": Other audio will not be ducked. (default)
+ * - "1": Other audio will be ducked.
+ *
+ * This hint should be set before an audio device is opened.
+ *
+ * \since This hint is available since SDL 3.6.0.
+ */
+#define SDL_HINT_AUDIO_DUCK_OTHERS "SDL_AUDIO_DUCK_OTHERS"
 
 /**
  * A variable controlling the audio rate when using the dummy audio driver.
